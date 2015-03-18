@@ -1,0 +1,8 @@
+Emma:
+	Mock-UI and image editing
+
+Emily:
+	Image processing
+
+Zhi:
+	All Lua code implementing

@@ -1,0 +1,2 @@
+1. Sending the OSC Network Data to slave device
+2. Sound generating
