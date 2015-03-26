@@ -18,7 +18,8 @@ upperTrack:SetAnchor("CENTER", 0.7*ScreenWidth(), 0.5*ScreenHeight())
 upperTrack:SetHeight(ScreenHeight()*0.75)
 upperTrack:SetWidth(ScreenWidth()*0.03)
 upperTrack.t = upperTrack:Texture(0, 0, 255, 255)
-upperTrack:SetLayer("LOW")
+upperTrack:SetLayer("MEDIUM")
+upperTrack:EnableInput(true)
 
 lowerTrack = Region()
 lowerTrack:Show()
@@ -26,7 +27,8 @@ lowerTrack:SetAnchor("CENTER", 0.85*ScreenWidth(), 0.5*ScreenHeight())
 lowerTrack:SetHeight(ScreenHeight()*0.75)
 lowerTrack:SetWidth(ScreenWidth()*0.03)
 lowerTrack.t = lowerTrack:Texture(0, 0, 255, 255)
-lowerTrack:SetLayer("LOW")
+lowerTrack:SetLayer("MEDIUM")
+lowerTrack:EnableInput(true)
 
 pianoContainer = Region()
 pianoContainer:Show()
@@ -34,7 +36,7 @@ pianoContainer:SetAnchor("CENTER", 0.3*ScreenWidth(), 0.5*ScreenHeight())
 pianoContainer:SetHeight(ScreenHeight()*0.75)
 pianoContainer:SetWidth(ScreenWidth()*0.45)
 pianoContainer.t = pianoContainer:Texture(125, 125, 125, 255)
-pianoContainer:SetLayer("LOW")
+pianoContainer:SetLayer("MEDIUM")
 
 -- block on lower track
 lowerBlock = Region()
@@ -45,18 +47,18 @@ lowerBlock:SetWidth(ScreenWidth()*0.08)
 lowerBlock.t = lowerBlock:Texture(100, 0, 255, 255)
 lowerBlock:SetLayer("LOW")
 lowerBlock:EnableInput(true)
-lowerBlock:EnableMoving(true)
+-- lowerBlock:EnableMoving(true)
 
 -- blocks on upper track
 upperLeftBlock = Region()
 upperLeftBlock:Show()
-upperLeftBlock:SetAnchor("CENTER", upperTrack,"CENTER", 0, 20)
+upperLeftBlock:SetAnchor("CENTER", upperTrack,"CENTER", 0, -ScreenHeight()*0.75/2)
 upperLeftBlock:SetHeight(ScreenHeight()*0.03)
 upperLeftBlock:SetWidth(ScreenWidth()*0.08)
 upperLeftBlock.t = upperLeftBlock:Texture(100, 0, 255, 255)
 upperLeftBlock:SetLayer("LOW")
-upperLeftBlock:EnableInput(true)
-upperLeftBlock:EnableMoving(true)
+-- upperLeftBlock:EnableInput(true)
+-- upperLeftBlock:EnableMoving(true)
 
 upperRightBlock = Region()
 upperRightBlock:Show()
@@ -66,7 +68,7 @@ upperRightBlock:SetWidth(ScreenWidth()*0.08)
 upperRightBlock.t = upperRightBlock:Texture(100, 0, 255, 255)
 upperRightBlock:SetLayer("LOW")
 upperRightBlock:EnableInput(true)
-upperRightBlock:EnableMoving(true)
+-- upperRightBlock:EnableMoving(true)
 
 -- Piano Keys (White)
 
@@ -256,10 +258,18 @@ soKey:Handle("OnLeave", whiteKeyTouchUp)
 laKey:Handle("OnLeave", whiteKeyTouchUp)
 xiKey:Handle("OnLeave", whiteKeyTouchUp)
 
--- function lowerBlockTouchDown( self )
--- 	anchor = self:Anchor()
--- 	--DPrint("x"..anchor.offsetX.."y"..anchor.offsetY)
--- 	self:SetAnchor(anchor.anchorLocation, anchor.relativeToRegion, anchor.relativeAnchorLocation, anchor.offsetX, 0)
--- end
+-- Block on track event
 
--- lowerBlock:Handle("OnTouchDown", lowerBlockTouchDown)
+function updateLowerBlock( self, x, y, dx, dy )
+	--DPrint("x: "..(x + dx)..", y: "..(y+dy))
+	lowerBlock:SetAnchor("BOTTOM", lowerTrack,"CENTER", 0, y+dy-ScreenHeight()*0.75/2)
+end
+
+lowerTrack:Handle("OnMove", updateLowerBlock)
+
+function updateupperRightBlock( self, x, y, dx, dy )
+	--DPrint("x: "..(x + dx)..", y: "..(y+dy))
+	upperRightBlock:SetAnchor("BOTTOM", upperTrack,"CENTER", 0, y+dy-ScreenHeight()*0.75/2)
+end
+
+upperTrack:Handle("OnMove", updateupperRightBlock)
