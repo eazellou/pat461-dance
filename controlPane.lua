@@ -3,6 +3,9 @@ FreeAllRegions()
 
 FreeAllRegions()
 
+host = "35.2.73.0"
+port = 8080
+
 bg = Region()
 bg:Show()
 bg:SetWidth(ScreenWidth())
@@ -80,6 +83,7 @@ doKey:SetWidth(ScreenWidth()*0.43)
 doKey.t = doKey:Texture(255, 255, 255, 255)
 doKey:SetLayer("MEDIUM")
 doKey:EnableInput(true)
+doKey.osc = "do"
 
 reKey = Region()
 reKey:Show()
@@ -89,6 +93,7 @@ reKey:SetWidth(ScreenWidth()*0.43)
 reKey.t = reKey:Texture(255, 255, 255, 255)
 reKey:SetLayer("MEDIUM")
 reKey:EnableInput(true)
+reKey.osc = "re"
 
 miKey = Region()
 miKey:Show()
@@ -98,6 +103,7 @@ miKey:SetWidth(ScreenWidth()*0.43)
 miKey.t = miKey:Texture(255, 255, 255, 255)
 miKey:SetLayer("MEDIUM")
 miKey:EnableInput(true)
+miKey.osc = "mi"
 
 faKey = Region()
 faKey:Show()
@@ -107,6 +113,7 @@ faKey:SetWidth(ScreenWidth()*0.43)
 faKey.t = faKey:Texture(255, 255, 255, 255)
 faKey:SetLayer("MEDIUM")
 faKey:EnableInput(true)
+faKey.osc = "fa"
 
 soKey = Region()
 soKey:Show()
@@ -116,6 +123,7 @@ soKey:SetWidth(ScreenWidth()*0.43)
 soKey.t = soKey:Texture(255, 255, 255, 255)
 soKey:SetLayer("MEDIUM")
 soKey:EnableInput(true)
+soKey.osc = "so"
 
 laKey = Region()
 laKey:Show()
@@ -125,6 +133,7 @@ laKey:SetWidth(ScreenWidth()*0.43)
 laKey.t = laKey:Texture(255, 255, 255, 255)
 laKey:SetLayer("MEDIUM")
 laKey:EnableInput(true)
+laKey.osc = "la"
 
 xiKey = Region()
 xiKey:Show()
@@ -134,6 +143,7 @@ xiKey:SetWidth(ScreenWidth()*0.43)
 xiKey.t = xiKey:Texture(255, 255, 255, 255)
 xiKey:SetLayer("MEDIUM")
 xiKey:EnableInput(true)
+xiKey.osc = "xi"
 
 -- Piano Keys (Black)
 doreKey = Region()
@@ -144,6 +154,7 @@ doreKey:SetWidth(ScreenWidth()*0.33)
 doreKey.t = doreKey:Texture(0, 0, 0, 255)
 doreKey:SetLayer("HIGH")
 doreKey:EnableInput(true)
+doreKey.osc = "dore"
 
 remiKey = Region()
 remiKey:Show()
@@ -153,6 +164,7 @@ remiKey:SetWidth(ScreenWidth()*0.33)
 remiKey.t = remiKey:Texture(0, 0, 0, 255)
 remiKey:SetLayer("HIGH")
 remiKey:EnableInput(true)
+remiKey.osc = "remi"
 
 fasoKey = Region()
 fasoKey:Show()
@@ -162,6 +174,7 @@ fasoKey:SetWidth(ScreenWidth()*0.33)
 fasoKey.t = fasoKey:Texture(0, 0, 0, 255)
 fasoKey:SetLayer("HIGH")
 fasoKey:EnableInput(true)
+fasoKey.osc = "faso"
 
 solaKey = Region()
 solaKey:Show()
@@ -171,6 +184,7 @@ solaKey:SetWidth(ScreenWidth()*0.33)
 solaKey.t = solaKey:Texture(0, 0, 0, 255)
 solaKey:SetLayer("HIGH")
 solaKey:EnableInput(true)
+solaKey.osc = "sola"
 
 laxiKey = Region()
 laxiKey:Show()
@@ -180,6 +194,7 @@ laxiKey:SetWidth(ScreenWidth()*0.33)
 laxiKey.t = laxiKey:Texture(0, 0, 0, 255)
 laxiKey:SetLayer("HIGH")
 laxiKey:EnableInput(true)
+laxiKey.osc = "laxi"
 
 ------------------------------------------------------------ Event Handler -------------------------------------------------------
 
@@ -187,6 +202,8 @@ laxiKey:EnableInput(true)
 function blackKeyTouchDown( self )
 	self:SetHeight(ScreenHeight()*0.05)
 	self:SetWidth(ScreenWidth()*0.3)
+	SendOSCMessage(host,port,"/urMus/text", self.osc)
+	DPrint("Sending: "..self.osc)
 end
 
 function blackKeyTouchUp( self )
@@ -220,6 +237,8 @@ laxiKey:Handle("OnLeave", blackKeyTouchUp)
 
 function whiteKeyTouchDown( self )
 	self.t:SetTexture(100, 100, 100, 255)
+	SendOSCMessage(host,port,"/urMus/text", self.osc)
+	DPrint("Sending: "..self.osc)
 end
 
 function whiteKeyTouchUp( self )
@@ -263,6 +282,8 @@ xiKey:Handle("OnLeave", whiteKeyTouchUp)
 function updateLowerBlock( self, x, y, dx, dy )
 	--DPrint("x: "..(x + dx)..", y: "..(y+dy))
 	lowerBlock:SetAnchor("BOTTOM", lowerTrack,"CENTER", 0, y+dy-ScreenHeight()*0.75/2)
+	scaledLower = (y+dy)/(ScreenHeight()*0.75)*2 - 1
+	DPrint("Lower Scale: "..scaledLower)
 end
 
 lowerTrack:Handle("OnMove", updateLowerBlock)
@@ -270,6 +291,8 @@ lowerTrack:Handle("OnMove", updateLowerBlock)
 function updateupperRightBlock( self, x, y, dx, dy )
 	--DPrint("x: "..(x + dx)..", y: "..(y+dy))
 	upperRightBlock:SetAnchor("BOTTOM", upperTrack,"CENTER", 0, y+dy-ScreenHeight()*0.75/2)
+	scaledHigher = (y+dy)/(ScreenHeight()*0.75)*2 - 1
+	DPrint("Higher Scale: "..scaledHigher)
 end
 
 upperTrack:Handle("OnMove", updateupperRightBlock)
