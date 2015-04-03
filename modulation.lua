@@ -2,13 +2,23 @@ FreeAllFlowboxes()
 FreeAllRegions()
 dac= FBDac
 
-asymp1 = FlowBox(FBAsymp)
-sinosc1 = FlowBox(FBSinOsc)
-push1 = FlowBox(FBPush)
-push1.Out:SetPush(asymp1.In)
-sinosc1.Amp:SetPull(asymp1.Out)
+asymp = FlowBox(FBAsymp)
+sinosc = FlowBox(FBSinOsc)
+energyPush = FlowBox(FBPush)
+--energyPush.Out:SetPush(asymp.In)
+--asymp.In:SetPull(energyPush.Out) --switch with this
+freqPush = FlowBox(FBPush)
+freqPush.Out:SetPush(sinosc.Freq)
+--energyPush.Out:SetPush(sinosc.Amp)
+--asymp.Out:SetPush(sinosc.Amp) --switch with this
 
-dac.In:SetPull(sinosc1.Out)
+dac.In:SetPull(sinosc.Out)
+
+--TEMPORARY FIX WITH POPS
+energyPush.Out:SetPush(sinosc.Amp)
+
+freqPush:Push(.3)
+energyPush:Push(.5)
 
 rotX = 0
 rotY = 0
@@ -24,7 +34,12 @@ end
 
 function printData()
 	--ranges from 1-100
-	DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
+	--DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
+end
+
+function addEnergy(energy)
+	--DPrint(energy)
+	energyPush:Push(energy)
 end
 
 function rotate(self, x, y, z)
@@ -35,9 +50,14 @@ function rotate(self, x, y, z)
 end
 
 function accel(self, x, y, z)
-	accX = round(100*x, 0)
-	accY = round(100*y, 0)
-	accZ = round(100*z, 0)
+	accX = round(x, 2)
+	accY = round(y, 2)
+	accZ = round(z, 2)
+	magnitude = round(math.sqrt(accX^2 + accY^2 + accZ^2),2)
+	--magnitude ranges about .98 - 3.5
+	energy = round((magnitude-.5) / 2.9, 2)
+	--energy ranges about .28 - 1
+	addEnergy(energy)
 	printData()
 end
 
