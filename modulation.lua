@@ -5,17 +5,15 @@ dac= FBDac
 asymp = FlowBox(FBAsymp)
 sinosc = FlowBox(FBSinOsc)
 energyPush = FlowBox(FBPush)
---energyPush.Out:SetPush(asymp.In)
---asymp.In:SetPull(energyPush.Out) --switch with this
+energyPush.Out:SetPush(asymp.In)
+asymp.In:SetPull(energyPush.Out) --switch with this
 freqPush = FlowBox(FBPush)
 freqPush.Out:SetPush(sinosc.Freq)
 --energyPush.Out:SetPush(sinosc.Amp)
 --asymp.Out:SetPush(sinosc.Amp) --switch with this
+sinosc.Amp:SetPull(asymp.Out)
 
 dac.In:SetPull(sinosc.Out)
-
---TEMPORARY FIX WITH POPS
-energyPush.Out:SetPush(sinosc.Amp)
 
 freqPush:Push(.3)
 energyPush:Push(.5)
@@ -53,10 +51,11 @@ function accel(self, x, y, z)
 	accX = round(x, 2)
 	accY = round(y, 2)
 	accZ = round(z, 2)
-	magnitude = round(math.sqrt(accX^2 + accY^2 + accZ^2),2)
+	magnitude = math.sqrt(accX^2 + accY^2 + accZ^2)
 	--magnitude ranges about .98 - 3.5
-	energy = round((magnitude-.5) / 2.9, 2)
+	energy = 1-magnitude
 	--energy ranges about .28 - 1
+	DPrint(energy)
 	addEnergy(energy)
 	printData()
 end
