@@ -2,28 +2,26 @@ FreeAllFlowboxes()
 FreeAllRegions()
 dac= FBDac
 
-asymp = FlowBox(FBAsymp)
 sinosc = FlowBox(FBSinOsc)
+
+asymp = FlowBox(FBAsymp)
 energyPush = FlowBox(FBPush)
 energyPush.Out:SetPush(asymp.In)
-asymp.In:SetPull(energyPush.Out) --switch with this
-freqPush = FlowBox(FBPush)
-freqPush.Out:SetPush(sinosc.Freq)
---energyPush.Out:SetPush(sinosc.Amp)
---asymp.Out:SetPush(sinosc.Amp) --switch with this
+asymp.In:SetPull(energyPush.Out)
 sinosc.Amp:SetPull(asymp.Out)
+
+freqPush = FlowBox(FBPush)
+freqSymp = FlowBox(FBAsymp)
+freqPush.Out:SetPush(freqSymp.In)
+freqSymp.In:SetPull(freqPush.Out)
+sinosc.Freq:SetPull(freqSymp.Out)
+
 
 dac.In:SetPull(sinosc.Out)
 
-freqPush:Push(.3)
+freqPush:Push(.5)
 energyPush:Push(.5)
 
-rotX = 0
-rotY = 0
-rotZ = 0
-accX = 0
-accY = 0
-accZ = 0
 
 function round(num, idp)
   local mult = 10^(idp or 0)
@@ -40,22 +38,27 @@ function addEnergy(energy)
 	energyPush:Push(energy)
 end
 
+function changeFreq(freq)
+	freqPush:Push(freq)
+end
+
 function rotate(self, x, y, z)
-	rotX = round(100*x, 0)
-	rotY = round(100*y, 0)
-	rotZ = round(100*z, 0)
+	rotX = round(x,2)
+	rotY = round(y,2)
+	rotZ = round(z,2)
+	magnitude = math.sqrt(x^2 + y^2 + z^2)
+	magnitude = magnitude*.5 + .25 --so that it doesn't go quite as high or low
+	changeFreq(magnitude)
+	DPrint(rotX .. " " .. rotY .. " " .. rotZ)
 	printData()
 end
 
 function accel(self, x, y, z)
-	accX = round(x, 2)
-	accY = round(y, 2)
-	accZ = round(z, 2)
-	magnitude = math.sqrt(accX^2 + accY^2 + accZ^2)
+	magnitude = math.sqrt(x^2 + y^2 + z^2)
 	--magnitude ranges about .98 - 3.5
 	energy = 1-magnitude
 	--energy ranges about .28 - 1
-	DPrint(energy)
+	--DPrint(accX)
 	addEnergy(energy)
 	printData()
 end
