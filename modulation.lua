@@ -1,5 +1,6 @@
 FreeAllFlowboxes()
 FreeAllRegions()
+DPrint("")
 dac= FBDac
 
 sinosc = FlowBox(FBSinOsc)
@@ -16,6 +17,10 @@ freqPush.Out:SetPush(freqSymp.In)
 freqSymp.In:SetPull(freqPush.Out)
 sinosc.Freq:SetPull(freqSymp.Out)
 
+--linPush = FlowBox(FBPush)
+--linPush.Out:SetPush(sinosc.NonL)
+--sinosc.NonL:SetPull(linPush.Out)
+
 sinosc2 = FlowBox(FBSinOsc)
 asymp2 = FlowBox(FBAsymp)
 energyPush2 = FlowBox(FBPush)
@@ -28,6 +33,10 @@ freqSymp2 = FlowBox(FBAsymp)
 freqPush2.Out:SetPush(freqSymp2.In)
 freqSymp2.In:SetPull(freqPush2.Out)
 sinosc2.Freq:SetPull(freqSymp2.Out)
+
+--linPush2 = FlowBox(FBPush)
+--linPush2.Out:SetPush(sinosc2.NonL)
+--sinosc2.NonL:SetPull(linPush2.Out)
 
 sinosc3 = FlowBox(FBSinOsc)
 asymp3 = FlowBox(FBAsymp)
@@ -42,6 +51,10 @@ freqPush3.Out:SetPush(freqSymp3.In)
 freqSymp3.In:SetPull(freqPush3.Out)
 sinosc3.Freq:SetPull(freqSymp3.Out)
 
+--linPush3 = FlowBox(FBPush)
+--linPush3.Out:SetPush(sinosc3.NonL)
+--sinosc3.NonL:SetPull(linPush3.Out)
+
 sinosc4 = FlowBox(FBSinOsc)
 asymp4 = FlowBox(FBAsymp)
 energyPush4 = FlowBox(FBPush)
@@ -55,6 +68,10 @@ freqPush4.Out:SetPush(freqSymp4.In)
 freqSymp4.In:SetPull(freqPush4.Out)
 sinosc4.Freq:SetPull(freqSymp4.Out)
 
+--linPush4 = FlowBox(FBPush)
+--linPush4.Out:SetPush(sinosc4.NonL)
+--sinosc4.NonL:SetPull(linPush4.Out)
+
 
 dac.In:SetPull(sinosc.Out)
 dac.In:SetPull(sinosc2.Out)
@@ -63,6 +80,10 @@ dac.In:SetPull(sinosc4.Out)
 
 freqPush:Push(.5)
 energyPush:Push(.5)
+--linPush:Push(-1)
+--linPush2:Push(-1)
+--linPush3:Push(-1)
+--linPush4:Push(-1)
 
 
 function round(num, idp)
@@ -76,11 +97,13 @@ function printData()
 end
 
 function addEnergy(energy)
-	--DPrint(energy)
+	DPrint(energy)
+	nonLin1 = energy/2 - 1
+	--linPush:Push(nonLin1)
 	energy1 = energy
 	energy2 = energy/2
 	energy3 = energy/4
-	energy4 = energy/8
+	energy4 = energy/64
 	energyPush:Push(energy1)
 	energyPush2:Push(energy2)
 	energyPush3:Push(energy3)
@@ -103,16 +126,23 @@ function rotate(self, x, y, z)
 	rotY = round(y,2)
 	rotZ = round(z,2)
 	magnitude = math.sqrt(x^2 + y^2 + z^2)
-	magnitude = magnitude*.5 + .25 --so that it doesn't go quite as high or low
+	magnitude = magnitude*.5 --so that it doesn't go quite as high or low
 	changeFreq(magnitude)
-	DPrint(rotX .. " " .. rotY .. " " .. rotZ)
+	--DPrint(rotX .. " " .. rotY .. " " .. rotZ)
 	printData()
 end
 
 function accel(self, x, y, z)
 	magnitude = math.sqrt(x^2 + y^2 + z^2)
+	--DPrint(magnitude)
 	--magnitude ranges about .98 - 3.5
-	energy = 1-magnitude
+	energy = (magnitude - 1)*.7
+	if energy > 1 then
+		energy = 1
+	end
+	if energy < 0 then
+		energy = 0
+	end
 	--energy ranges about .28 - 1
 	--DPrint(accX)
 	addEnergy(energy)
