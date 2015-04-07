@@ -1,3 +1,6 @@
+--Flag Dance Instrument --
+--Project members: Emma Azelborn, Zhi Qu, and Emily Eicher
+
 FreeAllFlowboxes()
 FreeAllRegions()
 DPrint("")
