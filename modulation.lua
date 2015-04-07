@@ -1,37 +1,43 @@
 FreeAllFlowboxes()
 FreeAllRegions()
 DPrint("")
-dac= FBDac
 
+dac= FBDac
 sinosc = FlowBox(FBCMap)
 
+-- energy1 -> Asymp -> CMap.Amp
 asymp = FlowBox(FBAsymp)
 energyPush = FlowBox(FBPush)
 energyPush.Out:SetPush(asymp.In)
 asymp.In:SetPull(energyPush.Out)
 sinosc.Amp:SetPull(asymp.Out)
 
+-- frequency -> Asymp -> CMap.Freq
 freqPush = FlowBox(FBPush)
 freqSymp = FlowBox(FBAsymp)
 freqPush.Out:SetPush(freqSymp.In)
 sinosc.Freq:SetPull(freqSymp.Out)
 
+-- nonLin1 -> Asymp -> CMap.NonL
 linPush = FlowBox(FBPush)
 linSymp = FlowBox(FBAsymp)
 linSymp.In:SetPull(linPush.Out)
 sinosc.NonL:SetPull(linSymp.Out)
 
+-- energy2 -> Asymp -> CMap.Amp
 sinosc2 = FlowBox(FBCMap)
 asymp2 = FlowBox(FBAsymp)
 energyPush2 = FlowBox(FBPush)
 energyPush2.Out:SetPush(asymp2.In)
 sinosc2.Amp:SetPull(asymp2.Out)
 
+-- frequency -> Asymp -> CMap.Freq
 freqPush2 = FlowBox(FBPush)
 freqSymp2 = FlowBox(FBAsymp)
 freqPush2.Out:SetPush(freqSymp2.In)
 sinosc2.Freq:SetPull(freqSymp2.Out)
 
+-- nonLin1 -> Asymp -> CMap.NonL
 linPush2 = FlowBox(FBPush)
 linSymp2 = FlowBox(FBAsymp)
 linSymp2.In:SetPull(linPush2.Out)
@@ -69,7 +75,7 @@ linSymp4 = FlowBox(FBAsymp)
 linSymp4.In:SetPull(linPush4.Out)
 sinosc4.NonL:SetPull(linSymp4.Out)
 
-
+-- CMap -> Dac
 dac.In:SetPull(sinosc.Out)
 dac.In:SetPull(sinosc2.Out)
 dac.In:SetPull(sinosc3.Out)
