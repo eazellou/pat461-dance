@@ -203,6 +203,45 @@ function gotOSC(self, num, data)
 end
 
 r:Handle("OnOSCMessage", gotOSC)
-
+r:SetWidth(ScreenWidth())
+r:SetHeight(ScreenHeight())
+r.t = r:Texture(255, 100, 100, 255)
+r:Show()
 SetOSCPort(8888)
 host,port = StartOSCListener()
+
+--------------------------------------------- UI ----------------------------------------------
+
+wave = Region()
+
+wave:SetHeight(10)
+wave:SetWidth(10)
+wave.t = wave:Texture(255, 255, 255, 255)
+wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
+wave:EnableInput(true)
+wave:Show()
+wave.shrinkspeed = 50
+
+wave.isActive = false
+
+function expand(self, elapsed)
+	if (self.isActive) then
+		DPrint("Scale: "..self:Width())
+		self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
+		self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
+		if (self:Height() >= ScreenHeight()) then
+			wave:SetHeight(10)
+			wave:SetWidth(10)
+			wave.isActive = true
+		end
+	end
+end
+
+function activate(self)
+	DPrint("Activated")
+	self.isActive = true
+	self:SetWidth(self.width)
+end
+
+wave:Handle("OnTouchDown", activate)
+wave:Handle("OnUpdate", expand)
