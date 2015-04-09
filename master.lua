@@ -15,6 +15,8 @@ sinosc.Amp:SetPull(asymp.Out)
 -- frequency -> Asymp -> CMap.Freq
 freqPush = FlowBox(FBPush)
 freqSymp = FlowBox(FBAsymp)
+fAttackPush = FlowBox(FBPush)
+fAttackPush.Out:SetPush(freqSymp.Tau)
 freqPush.Out:SetPush(freqSymp.In)
 sinosc.Freq:SetPull(freqSymp.Out)
 
@@ -34,6 +36,8 @@ sinosc2.Amp:SetPull(asymp2.Out)
 -- frequency -> Asymp -> CMap.Freq
 freqPush2 = FlowBox(FBPush)
 freqSymp2 = FlowBox(FBAsymp)
+fAttackPush2 = FlowBox(FBPush)
+fAttackPush2.Out:SetPush(freqSymp2.Tau)
 freqPush2.Out:SetPush(freqSymp2.In)
 sinosc2.Freq:SetPull(freqSymp2.Out)
 
@@ -51,6 +55,8 @@ sinosc3.Amp:SetPull(asymp3.Out)
 
 freqPush3 = FlowBox(FBPush)
 freqSymp3 = FlowBox(FBAsymp)
+fAttackPush3 = FlowBox(FBPush)
+fAttackPush3.Out:SetPush(freqSymp3.Tau)
 freqPush3.Out:SetPush(freqSymp3.In)
 sinosc3.Freq:SetPull(freqSymp3.Out)
 
@@ -67,6 +73,8 @@ sinosc4.Amp:SetPull(asymp4.Out)
 
 freqPush4 = FlowBox(FBPush)
 freqSymp4 = FlowBox(FBAsymp)
+fAttackPush4 = FlowBox(FBPush)
+fAttackPush4.Out:SetPush(freqSymp4.Tau)
 freqPush4.Out:SetPush(freqSymp4.In)
 sinosc4.Freq:SetPull(freqSymp4.Out)
 
@@ -87,6 +95,10 @@ linPush:Push(0)
 linPush2:Push(0)
 linPush3:Push(0)
 linPush4:Push(0)
+fAttackPush:Push(0)
+fAttackPush2:Push(0)
+fAttackPush3:Push(0)
+fAttackPush4:Push(0)
 
 
 function round(num, idp)

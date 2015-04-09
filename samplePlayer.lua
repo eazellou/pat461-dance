@@ -227,7 +227,13 @@ r:Handle("OnUpdate", detect)
 
 
 
+asymp = FlowBox(FBAsymp)
+sinosc = FlowBox(FBSinOsc)
+push = FlowBox(FBPush)
+push.Out:SetPush(asymp.In)
 
+sinosc.Amp:SetPull(asymp.Out)
+dac.In:SetPull(sinosc.Out)
 
 
 
