@@ -91,11 +91,37 @@ linSymp4 = FlowBox(FBAsymp)
 linSymp4.In:SetPull(linPush4.Out)
 sinosc4.NonL:SetPull(linSymp4.Out)
 
--- CMap -> Dac
-dac.In:SetPull(sinosc.Out)
-dac.In:SetPull(sinosc2.Out)
-dac.In:SetPull(sinosc3.Out)
-dac.In:SetPull(sinosc4.Out)
+-- CMap -> Rev
+rev = FlowBox(FBJCRev)
+rev2 = FlowBox(FBJCRev)
+rev3 = FlowBox(FBJCRev)
+rev4 = FlowBox(FBJCRev)
+rev.In:SetPull(sinosc.Out)
+rev2.In:SetPull(sinosc2.Out)
+rev3.In:SetPull(sinosc3.Out)
+rev4.In:SetPull(sinosc4.Out)
+
+revPush = FlowBox(FBPush)
+revPush:SetPush(rev.T60)
+revPush1 = FlowBox(FBPush)
+revPush1:SetPush(rev.T60)
+revPush2 = FlowBox(FBPush)
+revPush2:SetPush(rev.T60)
+revPush3 = FlowBox(FBPush)
+revPush3:SetPush(rev.T60)
+revPush4 = FlowBox(FBPush)
+revPush4:SetPush(rev.T60)
+
+revPush:Push(.6)
+revPush2:Push(.6)
+revPush3:Push(.6)
+revPush4:Push(.6)
+
+-- Rev -> Dac
+dac.In:SetPull(rev.Out)
+dac.In:SetPull(rev2.Out)
+dac.In:SetPull(rev3.Out)
+dac.In:SetPull(rev4.Out)
 
 freqPush:Push(.5)
 energyPush:Push(.5)
