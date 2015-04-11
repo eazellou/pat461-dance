@@ -61,8 +61,8 @@ end
 
 lastTime = Time()
 function createRing( self )
-	if Time() > lastTime + 1 then
-		DPrint("Touch: "..i)
+	if Time() > lastTime + .7 then
+		DPrint("")
 	    --wave[i] = Region()
 	    --initRing(wave[i])
 	    activate(wave[i])
@@ -218,7 +218,7 @@ function printData(value)
 end
 
 tau1 = -.8 --attack
-tau2 = 1 --release
+tau2 = -.5 --release
 interval = .1
 
 function addEnergy(energy)
@@ -276,7 +276,7 @@ function changeFreq(freq)
 		fAttackPush4:Push(tau2)
 	end
 	prevFreq = freq --update
-	freq = 1.5*freq - .8 --range from -.5 to .8
+	freq = 1.5*freq - 1 --range from -.5 to .8
 	-- printData(freq)
 	
 	freq1 = freq - interval
@@ -331,7 +331,7 @@ function accel(self, x, y, z)
 	if energy < .2 then
 		energy = .2
 	end
-	if energy > .7 then
+	if energy > .78 then
 		createRing(bg)
 	else
 		--printData("")
