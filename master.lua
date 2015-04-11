@@ -91,38 +91,29 @@ linSymp4 = FlowBox(FBAsymp)
 linSymp4.In:SetPull(linPush4.Out)
 sinosc4.NonL:SetPull(linSymp4.Out)
 
--- CMap -> Rev
-rev = FlowBox(FBJCRev)
-rev2 = FlowBox(FBJCRev)
-rev3 = FlowBox(FBJCRev)
-rev4 = FlowBox(FBJCRev)
-rev.In:SetPull(sinosc.Out)
-rev2.In:SetPull(sinosc2.Out)
-rev3.In:SetPull(sinosc3.Out)
-rev4.In:SetPull(sinosc4.Out)
+-- CMap - > Add
+add1 = FlowBox(FBAdd)
+add2 = FlowBox(FBAdd)
+addBig = FlowBox(FBAdd)
+add1.In1:SetPull(sinosc.Out)
+add1.In2:SetPull(sinosc2.Out)
+add2.In1:SetPull(sinosc3.Out)
+add2.In2:SetPull(sinosc4.Out)
+addBig.In1:SetPull(add1.Out)
+addBig.In2:SetPull(add2.Out)
 
+-- Add -> Rev
+rev = FlowBox(FBJCRev)
+rev.In:SetPull(addBig.Out)
 revPush = FlowBox(FBPush)
 revPush:SetPush(rev.T60)
-revPush1 = FlowBox(FBPush)
-revPush1:SetPush(rev.T60)
-revPush2 = FlowBox(FBPush)
-revPush2:SetPush(rev.T60)
-revPush3 = FlowBox(FBPush)
-revPush3:SetPush(rev.T60)
-revPush4 = FlowBox(FBPush)
-revPush4:SetPush(rev.T60)
-
 revPush:Push(.6)
-revPush2:Push(.6)
-revPush3:Push(.6)
-revPush4:Push(.6)
 
 -- Rev -> Dac
 dac.In:SetPull(rev.Out)
-dac.In:SetPull(rev2.Out)
-dac.In:SetPull(rev3.Out)
-dac.In:SetPull(rev4.Out)
 
+
+-- Tuning parameters
 freqPush:Push(.5)
 energyPush:Push(.5)
 linPush:Push(0)
@@ -151,22 +142,19 @@ function printData()
 	--DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
 end
 
-tau1 = -.9
-tau2 = .5
-
 function addEnergy(energy)
 	if energy > prevEnergy then
 		--increasing energy, want a quick attack
-		ampAttack:Push(tau1)
-		ampAttack2:Push(tau1)
-		ampAttack3:Push(tau1)
-		ampAttack4:Push(tau1)
+		ampAttack:Push(-.5)
+		ampAttack2:Push(-.5)
+		ampAttack3:Push(-.5)
+		ampAttack4:Push(-.5)
 	else
 		--decreasing energy, want a long release
-		ampAttack:Push(tau2)
-		ampAttack2:Push(tau2)
-		ampAttack3:Push(tau2)
-		ampAttack4:Push(tau2)
+		ampAttack:Push(.2)
+		ampAttack2:Push(.2)
+		ampAttack3:Push(.2)
+		ampAttack4:Push(.2)
 	end
 	prevEnergy = energy --update
 
@@ -194,16 +182,16 @@ end
 function changeFreq(freq)
 	if freq > prevFreq then
 		--increasing frequency so we want a quick attack
-		fAttackPush:Push(tau1)
-		fAttackPush2:Push(tau1)
-		fAttackPush3:Push(tau1)
-		fAttackPush4:Push(tau1)
+		fAttackPush:Push(-.5)
+		fAttackPush2:Push(-.5)
+		fAttackPush3:Push(-.5)
+		fAttackPush4:Push(-.5)
 	else
 		--decreasing frequency so we want a slow release
-		fAttackPush:Push(tau2)
-		fAttackPush2:Push(tau2)
-		fAttackPush3:Push(tau2)
-		fAttackPush4:Push(tau2)
+		fAttackPush:Push(.2)
+		fAttackPush2:Push(.2)
+		fAttackPush3:Push(.2)
+		fAttackPush4:Push(.2)
 	end
 	prevFreq = freq --update
 	
@@ -295,7 +283,7 @@ wave.t = wave:Texture(255, 255, 255, 255)
 wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
 wave:EnableInput(true)
 wave:Show()
-wave.shrinkspeed = 100
+wave.shrinkspeed = 50
 
 wave.isActive = false
 
@@ -319,4 +307,6 @@ function activate(self)
 end
 
 wave:Handle("OnTouchDown", activate)
+wave:Handle("OnUpdate", expand)
+wn", activate)
 wave:Handle("OnUpdate", expand)
