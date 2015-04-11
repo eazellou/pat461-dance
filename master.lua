@@ -35,14 +35,17 @@ function expand(self, elapsed)
     -- DPrint("Scale: "..self:Width())
     self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
     self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
-    if (self:Width() >= ScreenWidth()) then
-        self:SetHeight(0)
-        self:SetWidth(0)
+    if (self:Height() >= ScreenHeight()) then
+        self:SetHeight(originalSize)
+        self:SetWidth(originalSize)
+        self:Hide()
+        self:Handle("OnUpdate", nil)
     end
 end
 
 function activate(self)
     -- DPrint("Activated")
+    self:Show()
     self:Handle("OnUpdate", expand)
     self:SetWidth(self:Width())
 end
@@ -244,6 +247,7 @@ function addEnergy(energy)
 	linPush3:Push(nonLin3)
 	linPush4:Push(nonLin4)
 
+	
 	--amplitude
 	energy1 = energy
 	energy2 = energy/2
@@ -272,13 +276,27 @@ function changeFreq(freq)
 		fAttackPush4:Push(tau2)
 	end
 	prevFreq = freq --update
-	freq = 1.5*freq - .7 --range from -.5 to 1
-	--printData(freq)
+	freq = 1.5*freq - .8 --range from -.5 to .8
+	printData(freq)
 	
 	freq1 = freq - interval
-	freq2 = freq - interval*2
+	freq2 = freq 
 	freq3 = freq - interval*3
-	freq4 = freq
+	freq4 = freq - interval*2
+	
+	if freq1 < .25 then
+		freq1 = .1
+	end
+	if freq2 < .25 then
+		freq2 = .25
+	end
+	if freq3 < .25 then
+		freq3 = .25
+	end
+	if freq4 < .2 then
+		freq4 = .2
+	end
+	
 	freqPush:Push(freq1)
 	freqPush2:Push(freq2)
 	freqPush3:Push(freq3)
@@ -310,8 +328,8 @@ function accel(self, x, y, z)
 	if energy > .8 then
 		energy = .8
 	end
-	if energy < .05 then
-		energy = .05
+	if energy < .2 then
+		energy = .2
 	end
 	if energy > .7 then
 		createRing(bg)
