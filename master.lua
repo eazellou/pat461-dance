@@ -106,7 +106,7 @@ addBig.In2:SetPull(add2.Out)
 rev = FlowBox(FBJCRev)
 rev.In:SetPull(addBig.Out)
 revPush = FlowBox(FBPush)
-revPush:SetPush(rev.T60)
+revPush.Out:SetPush(rev.T60)
 revPush:Push(.6)
 
 -- Rev -> Dac
@@ -138,102 +138,102 @@ function round(num, idp)
 end
 
 function printData()
-	--ranges from 1-100
-	--DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
+    --ranges from 1-100
+    --DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
 end
 
 function addEnergy(energy)
-	if energy > prevEnergy then
-		--increasing energy, want a quick attack
-		ampAttack:Push(-.5)
-		ampAttack2:Push(-.5)
-		ampAttack3:Push(-.5)
-		ampAttack4:Push(-.5)
-	else
-		--decreasing energy, want a long release
-		ampAttack:Push(.2)
-		ampAttack2:Push(.2)
-		ampAttack3:Push(.2)
-		ampAttack4:Push(.2)
-	end
-	prevEnergy = energy --update
+    if energy > prevEnergy then
+        --increasing energy, want a quick attack
+        ampAttack:Push(-.5)
+        ampAttack2:Push(-.5)
+        ampAttack3:Push(-.5)
+        ampAttack4:Push(-.5)
+    else
+        --decreasing energy, want a long release
+        ampAttack:Push(.2)
+        ampAttack2:Push(.2)
+        ampAttack3:Push(.2)
+        ampAttack4:Push(.2)
+    end
+    prevEnergy = energy --update
 
-	--non-linear timbre
-	nonLin1 = energy
-	nonLin2 = 3*energy/4
-	nonLin3 = energy/2
-	nonLin4 = energy/4
-	linPush:Push(nonLin1)
-	linPush2:Push(nonLin2)
-	linPush3:Push(nonLin3)
-	linPush4:Push(nonLin4)
+    --non-linear timbre
+    nonLin1 = energy
+    nonLin2 = 3*energy/4
+    nonLin3 = energy/2
+    nonLin4 = energy/4
+    linPush:Push(nonLin1)
+    linPush2:Push(nonLin2)
+    linPush3:Push(nonLin3)
+    linPush4:Push(nonLin4)
 
-	--amplitude
-	energy1 = energy
-	energy2 = energy/2
-	energy3 = energy/4
-	energy4 = energy/64
-	energyPush:Push(energy1)
-	energyPush2:Push(energy2)
-	energyPush3:Push(energy3)
-	energyPush4:Push(energy4)
+    --amplitude
+    energy1 = energy
+    energy2 = energy/2
+    energy3 = energy/4
+    energy4 = energy/64
+    energyPush:Push(energy1)
+    energyPush2:Push(energy2)
+    energyPush3:Push(energy3)
+    energyPush4:Push(energy4)
 end
 
 function changeFreq(freq)
-	if freq > prevFreq then
-		--increasing frequency so we want a quick attack
-		fAttackPush:Push(-.5)
-		fAttackPush2:Push(-.5)
-		fAttackPush3:Push(-.5)
-		fAttackPush4:Push(-.5)
-	else
-		--decreasing frequency so we want a slow release
-		fAttackPush:Push(.2)
-		fAttackPush2:Push(.2)
-		fAttackPush3:Push(.2)
-		fAttackPush4:Push(.2)
-	end
-	prevFreq = freq --update
-	
-	freq1 = freq/4 + 3/16
-	freq2 = freq/3 + 1/6
-	freq3 = freq/2 + 1/8
-	freq4 = freq
-	freqPush:Push(freq1)
-	freqPush2:Push(freq2)
-	freqPush3:Push(freq3)
-	freqPush4:Push(freq4)
+    if freq > prevFreq then
+        --increasing frequency so we want a quick attack
+        fAttackPush:Push(-.5)
+        fAttackPush2:Push(-.5)
+        fAttackPush3:Push(-.5)
+        fAttackPush4:Push(-.5)
+    else
+        --decreasing frequency so we want a slow release
+        fAttackPush:Push(.2)
+        fAttackPush2:Push(.2)
+        fAttackPush3:Push(.2)
+        fAttackPush4:Push(.2)
+    end
+    prevFreq = freq --update
+    
+    freq1 = freq/4 + 3/16
+    freq2 = freq/3 + 1/6
+    freq3 = freq/2 + 1/8
+    freq4 = freq
+    freqPush:Push(freq1)
+    freqPush2:Push(freq2)
+    freqPush3:Push(freq3)
+    freqPush4:Push(freq4)
 end
 
 function rotate(self, x, y, z)
-	rotX = round(x,2)
-	rotY = round(y,2)
-	rotZ = round(z,2)
-	magnitude = math.sqrt(x^2 + y^2 + z^2)
-	magnitude = magnitude*.5 --so that it doesn't go quite as high or low
-	changeFreq(magnitude)
-	--DPrint(rotX .. " " .. rotY .. " " .. rotZ)
-	printData()
+    rotX = round(x,2)
+    rotY = round(y,2)
+    rotZ = round(z,2)
+    magnitude = math.sqrt(x^2 + y^2 + z^2)
+    magnitude = magnitude*.5 --so that it doesn't go quite as high or low
+    changeFreq(magnitude)
+    --DPrint(rotX .. " " .. rotY .. " " .. rotZ)
+    printData()
 end
 
 function accel(self, x, y, z)
-	magnitude = math.sqrt(x^2 + y^2 + z^2)
-	--DPrint(magnitude)
-	--magnitude ranges about .98 - 3.5
-	energy = (magnitude - 1)*.7
-	if energy > .8 then
-		energy = .8
-	end
-	if energy < .05 then
-		energy = .05
-	end
-	--energy ranges about .28 - 1
-	--DPrint(accX)
-	addEnergy(energy)
-	printData()
+    magnitude = math.sqrt(x^2 + y^2 + z^2)
+    --DPrint(magnitude)
+    --magnitude ranges about .98 - 3.5
+    energy = (magnitude - 1)*.7
+    if energy > .8 then
+        energy = .8
+    end
+    if energy < .05 then
+        energy = .05
+    end
+    --energy ranges about .28 - 1
+    --DPrint(accX)
+    addEnergy(energy)
+    printData()
 end
 
-r = Region()
+bg = Region()
 
 xr = 0
 yr = 0
@@ -244,67 +244,75 @@ za = 0
 
 -- We register this function to be called when a network traffic is incoming
 function gotOSC(self, num, data)
-	if num == 1 then
-		xr = data
-	elseif num == 2 then
-		yr = data
-	elseif num == 3 then
-		zr = data
-	elseif num == 4 then
-		xa = data
-	elseif num == 5 then
-		ya = data
-	elseif num == 6 then
-		za = data
-	else
-		DPrint("Error")
-	end
-	
-	DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
+    if num == 1 then
+        xr = data
+    elseif num == 2 then
+        yr = data
+    elseif num == 3 then
+        zr = data
+    elseif num == 4 then
+        xa = data
+    elseif num == 5 then
+        ya = data
+    elseif num == 6 then
+        za = data
+    else
+        DPrint("Error")
+    end
+    
+    -- DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
     rotate(self, xr, yr, zr)
     accel(self, xa, ya, za)
 end
 
-r:Handle("OnOSCMessage", gotOSC)
-r:SetWidth(ScreenWidth())
-r:SetHeight(ScreenHeight())
-r.t = r:Texture(255, 100, 100, 255)
-r:Show()
+bg:Handle("OnOSCMessage", gotOSC)
+bg:SetWidth(ScreenWidth())
+bg:SetHeight(ScreenHeight())
+bg.t = bg:Texture(0, 0, 0, 255)
+bg:Show()
+bg:EnableInput(true)
 SetOSCPort(8888)
 host,port = StartOSCListener()
 
 --------------------------------------------- UI ----------------------------------------------
+originalSize = 20
 
-wave = Region()
-
-wave:SetHeight(10)
-wave:SetWidth(10)
-wave.t = wave:Texture(DocumentPath("blurryRing.png"))
-wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
-wave:EnableInput(true)
-wave:Show()
-wave.shrinkspeed = 50
-
-wave.isActive = false
+function initRing( self )
+    self:SetHeight(originalSize)
+    self:SetWidth(originalSize)
+    self.t = self:Texture(DocumentPath("blurryRing.png"))
+    self:Show()
+    self.t:SetBlendMode("ALPHAKEY")
+    self:SetAnchor("CENTER", math.random(0, ScreenWidth()), math.random(0, ScreenHeight()))
+    -- self:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
+    self:EnableInput(true)
+    self.shrinkspeed = 200
+end
 
 function expand(self, elapsed)
-	if (self.isActive) then
-		DPrint("Scale: "..self:Width())
-		self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
-		self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
-		if (self:Height() >= ScreenHeight()) then
-			wave:SetHeight(10)
-			wave:SetWidth(10)
-			wave.isActive = true
-		end
-	end
+    -- DPrint("Scale: "..self:Width())
+    self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
+    self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
+    if (self:Width() >= ScreenWidth()) then
+        self:SetHeight(0)
+        self:SetWidth(0)
+    end
 end
 
 function activate(self)
-	DPrint("Activated")
-	self.isActive = true
-	self:SetWidth(self.width)
+    -- DPrint("Activated")
+    self:Handle("OnUpdate", expand)
+    self:SetWidth(self:Width())
 end
 
-wave:Handle("OnTouchDown", activate)
-wave:Handle("OnUpdate", expand)
+i = 1
+wave = {}
+function createRing( self )
+	DPrint("Touch: "..i)
+    wave[i] = Region()
+    initRing(wave[i])
+    activate(wave[i])
+    i = i + 1
+end
+
+bg:Handle("OnTouchDown", createRing)
