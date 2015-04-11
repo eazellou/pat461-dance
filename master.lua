@@ -22,7 +22,7 @@ originalSize = 1
 function initRing( self )
     self:SetHeight(originalSize)
     self:SetWidth(originalSize)
-    self.t = self:Texture(DocumentPath("blurryRing.png"))
+    self.t = self:Texture(DocumentPath("whiteRing.png"))
     self:Show()
     self.t:SetBlendMode("ALPHAKEY")
     self:SetAnchor("CENTER", math.random(0, ScreenWidth()), math.random(0, ScreenHeight()))
