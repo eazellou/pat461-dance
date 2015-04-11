@@ -106,8 +106,8 @@ addBig.In2:SetPull(add2.Out)
 rev = FlowBox(FBJCRev)
 rev.In:SetPull(addBig.Out)
 revPush = FlowBox(FBPush)
-revPush:SetPush(rev.T60)
-revPush:Push(.6)
+revPush.Out:SetPush(rev.T60)
+revPush:Push(1)
 
 -- Rev -> Dac
 dac.In:SetPull(rev.Out)
@@ -137,36 +137,42 @@ function round(num, idp)
   return math.floor(num * mult + 0.5) / mult
 end
 
-function printData()
-	--ranges from 1-100
-	--DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
+function printData(value)
+	DPrint(value)
 end
+
+tau1 = -.8 --attack
+tau2 = 1 --release
+interval = .1
 
 function addEnergy(energy)
 	if energy > prevEnergy then
 		--increasing energy, want a quick attack
-		ampAttack:Push(-.5)
-		ampAttack2:Push(-.5)
-		ampAttack3:Push(-.5)
-		ampAttack4:Push(-.5)
+		ampAttack:Push(tau1)
+		ampAttack2:Push(tau1)
+		ampAttack3:Push(tau1)
+		ampAttack4:Push(tau1)
 	else
 		--decreasing energy, want a long release
-		ampAttack:Push(.2)
-		ampAttack2:Push(.2)
-		ampAttack3:Push(.2)
-		ampAttack4:Push(.2)
+		ampAttack:Push(tau2)
+		ampAttack2:Push(tau2)
+		ampAttack3:Push(tau2)
+		ampAttack4:Push(tau2)
 	end
 	prevEnergy = energy --update
 
 	--non-linear timbre
 	nonLin1 = energy
-	nonLin2 = 3*energy/4
-	nonLin3 = energy/2
-	nonLin4 = energy/4
+	nonLin2 = energy
+	nonLin3 = energy
+	nonLin4 = energy
 	linPush:Push(nonLin1)
 	linPush2:Push(nonLin2)
 	linPush3:Push(nonLin3)
 	linPush4:Push(nonLin4)
+	
+	--interval
+	--interval = .1 + energy/2
 
 	--amplitude
 	energy1 = energy
@@ -179,25 +185,29 @@ function addEnergy(energy)
 	energyPush4:Push(energy4)
 end
 
+
+
 function changeFreq(freq)
 	if freq > prevFreq then
 		--increasing frequency so we want a quick attack
-		fAttackPush:Push(-.5)
-		fAttackPush2:Push(-.5)
-		fAttackPush3:Push(-.5)
-		fAttackPush4:Push(-.5)
+		fAttackPush:Push(tau1)
+		fAttackPush2:Push(tau1)
+		fAttackPush3:Push(tau1)
+		fAttackPush4:Push(tau1)
 	else
 		--decreasing frequency so we want a slow release
-		fAttackPush:Push(.2)
-		fAttackPush2:Push(.2)
-		fAttackPush3:Push(.2)
-		fAttackPush4:Push(.2)
+		fAttackPush:Push(tau2)
+		fAttackPush2:Push(tau2)
+		fAttackPush3:Push(tau2)
+		fAttackPush4:Push(tau2)
 	end
 	prevFreq = freq --update
+	freq = 1.5*freq - .7 --range from -.5 to 1
+	--printData(freq)
 	
-	freq1 = freq/4 + 3/16
-	freq2 = freq/3 + 1/6
-	freq3 = freq/2 + 1/8
+	freq1 = freq - interval
+	freq2 = freq - interval*2
+	freq3 = freq - interval*3
 	freq4 = freq
 	freqPush:Push(freq1)
 	freqPush2:Push(freq2)
@@ -210,10 +220,16 @@ function rotate(self, x, y, z)
 	rotY = round(y,2)
 	rotZ = round(z,2)
 	magnitude = math.sqrt(x^2 + y^2 + z^2)
-	magnitude = magnitude*.5 --so that it doesn't go quite as high or low
+	--magnitude = magnitude*1.5 --so that it doesn't go quite as high or low
+	magnitude = -1*math.exp(-5*magnitude) + 1
+	if magnitude > 1 then
+		magnitude = 1
+	elseif magnitude < 0 then
+		magnitude = 0
+	end
 	changeFreq(magnitude)
 	--DPrint(rotX .. " " .. rotY .. " " .. rotZ)
-	printData()
+	--printData(magnitude)
 end
 
 function accel(self, x, y, z)
@@ -227,10 +243,15 @@ function accel(self, x, y, z)
 	if energy < .05 then
 		energy = .05
 	end
+	if energy > .7 then
+		printData("BIG")
+	else
+		printData("")
+	end
 	--energy ranges about .28 - 1
 	--DPrint(accX)
 	addEnergy(energy)
-	printData()
+	--printData()
 end
 
 r = Region()
@@ -260,7 +281,7 @@ function gotOSC(self, num, data)
 		DPrint("Error")
 	end
 	
-	DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
+	--DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
     rotate(self, xr, yr, zr)
     accel(self, xa, ya, za)
 end
