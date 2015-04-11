@@ -308,5 +308,3 @@ end
 
 wave:Handle("OnTouchDown", activate)
 wave:Handle("OnUpdate", expand)
-wn", activate)
-wave:Handle("OnUpdate", expand)
