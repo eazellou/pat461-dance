@@ -286,46 +286,54 @@ function gotOSC(self, num, data)
     accel(self, xa, ya, za)
 end
 
-r:Handle("OnOSCMessage", gotOSC)
-r:SetWidth(ScreenWidth())
-r:SetHeight(ScreenHeight())
-r.t = r:Texture(255, 100, 100, 255)
-r:Show()
+bg:Handle("OnOSCMessage", gotOSC)
+bg:SetWidth(ScreenWidth())
+bg:SetHeight(ScreenHeight())
+bg.t = bg:Texture(0, 0, 0, 255)
+bg:Show()
+bg:EnableInput(true)
 SetOSCPort(8888)
 host,port = StartOSCListener()
 
 --------------------------------------------- UI ----------------------------------------------
+originalSize = 20
 
-wave = Region()
-
-wave:SetHeight(10)
-wave:SetWidth(10)
-wave.t = wave:Texture(255, 255, 255, 255)
-wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
-wave:EnableInput(true)
-wave:Show()
-wave.shrinkspeed = 50
-
-wave.isActive = false
+function initRing( self )
+    self:SetHeight(originalSize)
+    self:SetWidth(originalSize)
+    self.t = self:Texture(DocumentPath("blurryRing.png"))
+    self:Show()
+    self.t:SetBlendMode("ALPHAKEY")
+    self:SetAnchor("CENTER", math.random(0, ScreenWidth()), math.random(0, ScreenHeight()))
+    -- self:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
+    self:EnableInput(true)
+    self.shrinkspeed = 200
+end
 
 function expand(self, elapsed)
-	if (self.isActive) then
-		DPrint("Scale: "..self:Width())
-		self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
-		self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
-		if (self:Height() >= ScreenHeight()) then
-			wave:SetHeight(10)
-			wave:SetWidth(10)
-			wave.isActive = true
-		end
-	end
+    -- DPrint("Scale: "..self:Width())
+    self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
+    self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
+    if (self:Width() >= ScreenWidth()) then
+        self:SetHeight(0)
+        self:SetWidth(0)
+    end
 end
 
 function activate(self)
-	DPrint("Activated")
-	self.isActive = true
-	self:SetWidth(self.width)
+    -- DPrint("Activated")
+    self:Handle("OnUpdate", expand)
+    self:SetWidth(self:Width())
 end
 
-wave:Handle("OnTouchDown", activate)
-wave:Handle("OnUpdate", expand)
+i = 1
+wave = {}
+function createRing( self )
+	DPrint("Touch: "..i)
+    wave[i] = Region()
+    initRing(wave[i])
+    activate(wave[i])
+    i = i + 1
+end
+
+bg:Handle("OnTouchDown", createRing)
