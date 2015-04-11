@@ -2,6 +2,63 @@ FreeAllFlowboxes()
 FreeAllRegions()
 DPrint("")
 
+
+--------------------------------------------- UI ----------------------------------------------
+
+bg = Region()
+bg:Handle("OnOSCMessage", gotOSC)
+bg:SetWidth(ScreenWidth())
+bg:SetHeight(ScreenHeight())
+bg.t = bg:Texture(0, 0, 0, 255)
+bg:Show()
+bg:EnableInput(true)
+SetOSCPort(8888)
+host,port = StartOSCListener()
+
+originalSize = 20
+
+function initRing( self )
+    self:SetHeight(originalSize)
+    self:SetWidth(originalSize)
+    self.t = self:Texture(DocumentPath("blurryRing.png"))
+    self:Show()
+    self.t:SetBlendMode("ALPHAKEY")
+    self:SetAnchor("CENTER", math.random(0, ScreenWidth()), math.random(0, ScreenHeight()))
+    -- self:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
+    self:EnableInput(true)
+    self.shrinkspeed = 200
+end
+
+function expand(self, elapsed)
+    -- DPrint("Scale: "..self:Width())
+    self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
+    self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
+    if (self:Width() >= ScreenWidth()) then
+        self:SetHeight(0)
+        self:SetWidth(0)
+    end
+end
+
+function activate(self)
+    -- DPrint("Activated")
+    self:Handle("OnUpdate", expand)
+    self:SetWidth(self:Width())
+end
+
+i = 1
+wave = {}
+function createRing( self )
+	DPrint("Touch: "..i)
+    wave[i] = Region()
+    initRing(wave[i])
+    activate(wave[i])
+    i = i + 1
+end
+
+bg:Handle("OnTouchDown", createRing)
+
+------------------------------------------------------- Sounds -------------------------------
+
 dac= FBDac
 sinosc = FlowBox(FBCMap)
 
@@ -244,17 +301,15 @@ function accel(self, x, y, z)
 		energy = .05
 	end
 	if energy > .7 then
-		printData("BIG")
+		createRing(bg)
 	else
-		printData("")
+		--printData("")
 	end
 	--energy ranges about .28 - 1
 	--DPrint(accX)
 	addEnergy(energy)
 	--printData()
 end
-
-r = Region()
 
 xr = 0
 yr = 0
@@ -285,55 +340,3 @@ function gotOSC(self, num, data)
     rotate(self, xr, yr, zr)
     accel(self, xa, ya, za)
 end
-
-bg:Handle("OnOSCMessage", gotOSC)
-bg:SetWidth(ScreenWidth())
-bg:SetHeight(ScreenHeight())
-bg.t = bg:Texture(0, 0, 0, 255)
-bg:Show()
-bg:EnableInput(true)
-SetOSCPort(8888)
-host,port = StartOSCListener()
-
---------------------------------------------- UI ----------------------------------------------
-originalSize = 20
-
-function initRing( self )
-    self:SetHeight(originalSize)
-    self:SetWidth(originalSize)
-    self.t = self:Texture(DocumentPath("blurryRing.png"))
-    self:Show()
-    self.t:SetBlendMode("ALPHAKEY")
-    self:SetAnchor("CENTER", math.random(0, ScreenWidth()), math.random(0, ScreenHeight()))
-    -- self:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
-    self:EnableInput(true)
-    self.shrinkspeed = 200
-end
-
-function expand(self, elapsed)
-    -- DPrint("Scale: "..self:Width())
-    self:SetWidth(self:Width() + elapsed * self.shrinkspeed)
-    self:SetHeight(self:Height() + elapsed * self.shrinkspeed)
-    if (self:Width() >= ScreenWidth()) then
-        self:SetHeight(0)
-        self:SetWidth(0)
-    end
-end
-
-function activate(self)
-    -- DPrint("Activated")
-    self:Handle("OnUpdate", expand)
-    self:SetWidth(self:Width())
-end
-
-i = 1
-wave = {}
-function createRing( self )
-	DPrint("Touch: "..i)
-    wave[i] = Region()
-    initRing(wave[i])
-    activate(wave[i])
-    i = i + 1
-end
-
-bg:Handle("OnTouchDown", createRing)
