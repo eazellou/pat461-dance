@@ -279,7 +279,7 @@ wave = Region()
 
 wave:SetHeight(10)
 wave:SetWidth(10)
-wave.t = wave:Texture(255, 255, 255, 255)
+wave.t = wave:Texture(DocumentPath("blurryRing.png"))
 wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
 wave:EnableInput(true)
 wave:Show()
