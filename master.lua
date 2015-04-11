@@ -4,38 +4,10 @@ DPrint("")
 
 
 --------------------------------------------- UI ----------------------------------------------
-xr = 0
-yr = 0
-zr = 0
-xa = 0
-ya = 0
-za = 0
 
--- We register this function to be called when a network traffic is incoming
-function gotOSC(self, num, data)
-	if num == 1 then
-		xr = data
-	elseif num == 2 then
-		yr = data
-	elseif num == 3 then
-		zr = data
-	elseif num == 4 then
-		xa = data
-	elseif num == 5 then
-		ya = data
-	elseif num == 6 then
-		za = data
-	else
-		DPrint("Error")
-	end
-	
-	--DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
-    rotate(self, xr, yr, zr)
-    accel(self, xa, ya, za)
-end
 
 bg = Region()
-bg:Handle("OnOSCMessage", gotOSC)
+
 bg:SetWidth(ScreenWidth())
 bg:SetHeight(ScreenHeight())
 bg.t = bg:Texture(0, 0, 0, 255)
@@ -45,7 +17,7 @@ SetOSCPort(8888)
 host,port = StartOSCListener()
 
 
-originalSize = 20
+originalSize = 1
 
 function initRing( self )
     self:SetHeight(originalSize)
@@ -78,14 +50,23 @@ end
 i = 1
 wave = {}
 
+for j=1,10 do
+	wave[j] = Region()
+	initRing(wave[j])
+	--activate(wave[j])
+end
+
 lastTime = Time()
 function createRing( self )
 	if Time() > lastTime + 1 then
 		DPrint("Touch: "..i)
-	    wave[i] = Region()
-	    initRing(wave[i])
+	    --wave[i] = Region()
+	    --initRing(wave[i])
 	    activate(wave[i])
 	    i = i + 1
+		if i > 10 then
+			i = 1
+		end
 	    lastTime = Time()
 	end
 end
@@ -262,9 +243,6 @@ function addEnergy(energy)
 	linPush2:Push(nonLin2)
 	linPush3:Push(nonLin3)
 	linPush4:Push(nonLin4)
-	
-	--interval
-	--interval = .1 + energy/2
 
 	--amplitude
 	energy1 = energy
@@ -346,3 +324,35 @@ function accel(self, x, y, z)
 	--printData()
 end
 
+
+---OSC---
+xr = 0
+yr = 0
+zr = 0
+xa = 0
+ya = 0
+za = 0
+
+-- We register this function to be called when a network traffic is incoming
+function gotOSC(self, num, data)
+	if num == 1 then
+		xr = data
+	elseif num == 2 then
+		yr = data
+	elseif num == 3 then
+		zr = data
+	elseif num == 4 then
+		xa = data
+	elseif num == 5 then
+		ya = data
+	elseif num == 6 then
+		za = data
+	else
+		DPrint("Error")
+	end
+	
+	--DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
+    rotate(self, xr, yr, zr)
+    accel(self, xa, ya, za)
+end
+bg:Handle("OnOSCMessage", gotOSC)
