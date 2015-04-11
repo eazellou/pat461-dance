@@ -4,38 +4,9 @@ DPrint("")
 
 
 --------------------------------------------- UI ----------------------------------------------
-xr = 0
-yr = 0
-zr = 0
-xa = 0
-ya = 0
-za = 0
 
--- We register this function to be called when a network traffic is incoming
-function gotOSC(self, num, data)
-	if num == 1 then
-		xr = data
-	elseif num == 2 then
-		yr = data
-	elseif num == 3 then
-		zr = data
-	elseif num == 4 then
-		xa = data
-	elseif num == 5 then
-		ya = data
-	elseif num == 6 then
-		za = data
-	else
-		DPrint("Error")
-	end
-	
-	--DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
-    rotate(self, xr, yr, zr)
-    accel(self, xa, ya, za)
-end
 
 bg = Region()
-bg:Handle("OnOSCMessage", gotOSC)
 bg:SetWidth(ScreenWidth())
 bg:SetHeight(ScreenHeight())
 bg.t = bg:Texture(0, 0, 0, 255)
@@ -90,7 +61,7 @@ function createRing( self )
 	end
 end
 
---bg:Handle("OnTouchDown", createRing)
+bg:Handle("OnTouchDown", createRing)
 
 ------------------------------------------------------- Sounds -------------------------------
 
@@ -346,3 +317,34 @@ function accel(self, x, y, z)
 	--printData()
 end
 
+xr = 0
+yr = 0
+zr = 0
+xa = 0
+ya = 0
+za = 0
+
+-- We register this function to be called when a network traffic is incoming
+function gotOSC(self, num, data)
+	if num == 1 then
+		xr = data
+	elseif num == 2 then
+		yr = data
+	elseif num == 3 then
+		zr = data
+	elseif num == 4 then
+		xa = data
+	elseif num == 5 then
+		ya = data
+	elseif num == 6 then
+		za = data
+	else
+		DPrint("Error")
+	end
+	
+	--DPrint("Receiving\nRotation: "..(xr or "nil").." "..(yr or "nil").." "..(zr or "nil").." ".."\nAccel: "..(xa or "nil").." "..(ya or "nil").." "..(za or "nil"))
+    rotate(self, xr, yr, zr)
+    accel(self, xa, ya, za)
+end
+
+bg:Handle("OnOSCMessage", gotOSC)
