@@ -8,6 +8,8 @@ sinosc = FlowBox(FBCMap)
 -- energy1 -> Asymp -> CMap.Amp
 asymp = FlowBox(FBAsymp)
 energyPush = FlowBox(FBPush)
+ampAttack = FlowBox(FBPush)
+ampAttack.Out:SetPush(asymp.Tau)
 energyPush.Out:SetPush(asymp.In)
 asymp.In:SetPull(energyPush.Out)
 sinosc.Amp:SetPull(asymp.Out)
@@ -29,6 +31,8 @@ sinosc.NonL:SetPull(linSymp.Out)
 -- energy2 -> Asymp -> CMap.Amp
 sinosc2 = FlowBox(FBCMap)
 asymp2 = FlowBox(FBAsymp)
+ampAttack2 = FlowBox(FBPush)
+ampAttack2.Out:SetPush(asymp2.Tau)
 energyPush2 = FlowBox(FBPush)
 energyPush2.Out:SetPush(asymp2.In)
 sinosc2.Amp:SetPull(asymp2.Out)
@@ -49,6 +53,8 @@ sinosc2.NonL:SetPull(linSymp2.Out)
 
 sinosc3 = FlowBox(FBCMap)
 asymp3 = FlowBox(FBAsymp)
+ampAttack3 = FlowBox(FBPush)
+ampAttack3.Out:SetPush(asymp3.Tau)
 energyPush3 = FlowBox(FBPush)
 energyPush3.Out:SetPush(asymp3.In)
 sinosc3.Amp:SetPull(asymp3.Out)
@@ -67,6 +73,8 @@ sinosc3.NonL:SetPull(linSymp3.Out)
 
 sinosc4 = FlowBox(FBCMap)
 asymp4 = FlowBox(FBAsymp)
+ampAttack4 = FlowBox(FBPush)
+ampAttack4.Out:SetPush(asymp4.Tau)
 energyPush4 = FlowBox(FBPush)
 energyPush4.Out:SetPush(asymp4.In)
 sinosc4.Amp:SetPull(asymp4.Out)
@@ -95,11 +103,17 @@ linPush:Push(0)
 linPush2:Push(0)
 linPush3:Push(0)
 linPush4:Push(0)
-fAttackPush:Push(0)
-fAttackPush2:Push(0)
-fAttackPush3:Push(0)
-fAttackPush4:Push(0)
+fAttackPush:Push(-.5) --start out with a quick attack
+fAttackPush2:Push(-.5)
+fAttackPush3:Push(-.5)
+fAttackPush4:Push(-.5)
+ampAttack:Push(-.5)
+ampAttack2:Push(-.5)
+ampAttack3:Push(-.5)
+ampAttack4:Push(-.5)
 
+prevEnergy = 0
+prevFreq = 0
 
 function round(num, idp)
   local mult = 10^(idp or 0)
@@ -112,7 +126,22 @@ function printData()
 end
 
 function addEnergy(energy)
-	DPrint(energy)
+	if energy > prevEnergy then
+		--increasing energy, want a quick attack
+		ampAttack:Push(-.5)
+		ampAttack2:Push(-.5)
+		ampAttack3:Push(-.5)
+		ampAttack4:Push(-.5)
+	else
+		--decreasing energy, want a long release
+		ampAttack:Push(.2)
+		ampAttack2:Push(.2)
+		ampAttack3:Push(.2)
+		ampAttack4:Push(.2)
+	end
+	prevEnergy = energy --update
+
+	--non-linear timbre
 	nonLin1 = energy
 	nonLin2 = 3*energy/4
 	nonLin3 = energy/2
@@ -121,6 +150,8 @@ function addEnergy(energy)
 	linPush2:Push(nonLin2)
 	linPush3:Push(nonLin3)
 	linPush4:Push(nonLin4)
+
+	--amplitude
 	energy1 = energy
 	energy2 = energy/2
 	energy3 = energy/4
@@ -132,6 +163,21 @@ function addEnergy(energy)
 end
 
 function changeFreq(freq)
+	if freq > prevFreq then
+		--increasing frequency so we want a quick attack
+		fAttackPush:Push(-.5)
+		fAttackPush2:Push(-.5)
+		fAttackPush3:Push(-.5)
+		fAttackPush4:Push(-.5)
+	else
+		--decreasing frequency so we want a slow release
+		fAttackPush:Push(.2)
+		fAttackPush2:Push(.2)
+		fAttackPush3:Push(.2)
+		fAttackPush4:Push(.2)
+	end
+	prevFreq = freq --update
+	
 	freq1 = freq/4 + 3/16
 	freq2 = freq/3 + 1/6
 	freq3 = freq/2 + 1/8
