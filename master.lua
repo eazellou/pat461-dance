@@ -277,7 +277,7 @@ function changeFreq(freq)
 	end
 	prevFreq = freq --update
 	freq = 1.5*freq - .8 --range from -.5 to .8
-	printData(freq)
+	-- printData(freq)
 	
 	freq1 = freq - interval
 	freq2 = freq 
@@ -373,14 +373,5 @@ function gotOSC(self, num, data)
     rotate(self, xr, yr, zr)
     accel(self, xa, ya, za)
 end
-bg:Handle("OnOSCMessage", gotOSC)
-).." "..(ya or "nil").." "..(za or "nil"))
-    rotate(self, xr, yr, zr)
-    accel(self, xa, ya, za)
-end
-<<<<<<< HEAD
-bg:Handle("OnOSCMessage", gotOSC)
-=======
 
 bg:Handle("OnOSCMessage", gotOSC)
->>>>>>> 4a42636c1aa6d172877edd4e699f1b937cca09a1
