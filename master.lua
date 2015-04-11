@@ -125,19 +125,22 @@ function printData()
 	--DPrint("gyro: " .. rotX .. "  " .. rotY .. " " .. rotZ .. "   accel: " .. accX .. " " .. accY .. " " .. accZ)
 end
 
+tau1 = -.9
+tau2 = .5
+
 function addEnergy(energy)
 	if energy > prevEnergy then
 		--increasing energy, want a quick attack
-		ampAttack:Push(-.5)
-		ampAttack2:Push(-.5)
-		ampAttack3:Push(-.5)
-		ampAttack4:Push(-.5)
+		ampAttack:Push(tau1)
+		ampAttack2:Push(tau1)
+		ampAttack3:Push(tau1)
+		ampAttack4:Push(tau1)
 	else
 		--decreasing energy, want a long release
-		ampAttack:Push(.2)
-		ampAttack2:Push(.2)
-		ampAttack3:Push(.2)
-		ampAttack4:Push(.2)
+		ampAttack:Push(tau2)
+		ampAttack2:Push(tau2)
+		ampAttack3:Push(tau2)
+		ampAttack4:Push(tau2)
 	end
 	prevEnergy = energy --update
 
@@ -165,16 +168,16 @@ end
 function changeFreq(freq)
 	if freq > prevFreq then
 		--increasing frequency so we want a quick attack
-		fAttackPush:Push(-.5)
-		fAttackPush2:Push(-.5)
-		fAttackPush3:Push(-.5)
-		fAttackPush4:Push(-.5)
+		fAttackPush:Push(tau1)
+		fAttackPush2:Push(tau1)
+		fAttackPush3:Push(tau1)
+		fAttackPush4:Push(tau1)
 	else
 		--decreasing frequency so we want a slow release
-		fAttackPush:Push(.2)
-		fAttackPush2:Push(.2)
-		fAttackPush3:Push(.2)
-		fAttackPush4:Push(.2)
+		fAttackPush:Push(tau2)
+		fAttackPush2:Push(tau2)
+		fAttackPush3:Push(tau2)
+		fAttackPush4:Push(tau2)
 	end
 	prevFreq = freq --update
 	
@@ -266,7 +269,7 @@ wave.t = wave:Texture(255, 255, 255, 255)
 wave:SetAnchor("CENTER", 0.5*ScreenWidth(), 0.5*ScreenHeight())
 wave:EnableInput(true)
 wave:Show()
-wave.shrinkspeed = 50
+wave.shrinkspeed = 100
 
 wave.isActive = false
 
