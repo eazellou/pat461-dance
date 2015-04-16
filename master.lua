@@ -196,10 +196,10 @@ linPush:Push(0)
 linPush2:Push(0)
 linPush3:Push(0)
 linPush4:Push(0)
-fAttackPush:Push(-.5) --start out with a quick attack
-fAttackPush2:Push(-.5)
-fAttackPush3:Push(-.5)
-fAttackPush4:Push(-.5)
+fAttackPush:Push(-.9) --start out with a quick attack
+fAttackPush2:Push(-.9)
+fAttackPush3:Push(-.9)
+fAttackPush4:Push(-.9)
 ampAttack:Push(-.5)
 ampAttack2:Push(-.5)
 ampAttack3:Push(-.5)
@@ -220,6 +220,7 @@ end
 tau1 = -.8 --attack
 tau2 = -.5 --release
 interval = .1
+prevFreq = 0
 
 function addEnergy(energy)
 	if energy > prevEnergy then
@@ -250,9 +251,9 @@ function addEnergy(energy)
 	
 	--amplitude
 	energy1 = energy
-	energy2 = energy/2
-	energy3 = energy/4
-	energy4 = energy/64
+	energy2 = energy/4
+	energy3 = energy
+	energy4 = energy/16
 	energyPush:Push(energy1)
 	energyPush2:Push(energy2)
 	energyPush3:Push(energy3)
@@ -262,39 +263,45 @@ end
 
 
 function changeFreq(freq)
-	if freq > prevFreq then
-		--increasing frequency so we want a quick attack
-		fAttackPush:Push(tau1)
-		fAttackPush2:Push(tau1)
-		fAttackPush3:Push(tau1)
-		fAttackPush4:Push(tau1)
-	else
-		--decreasing frequency so we want a slow release
-		fAttackPush:Push(tau2)
-		fAttackPush2:Push(tau2)
-		fAttackPush3:Push(tau2)
-		fAttackPush4:Push(tau2)
+	if ((math.abs(prevFreq - freq) <= .07) and freq > .1) then
+		--hasn't changed very much
+		interval = interval + .0005
+		if interval > .3 then
+			interval = .3
+		end
+	elseif math.abs(prevFreq -freq) >= .1 then
+		--is changing 
+		if interval > .1 then
+			interval = interval - .2
+		else
+			interval = .1
+		end
 	end
-	prevFreq = freq --update
-	freq = 1.5*freq - 1 --range from -.5 to .8
+	prevFreq = freq
+		
+	freq = 1.5*freq - .85 --range
 	-- printData(freq)
 	
 	freq1 = freq - interval
 	freq2 = freq 
-	freq3 = freq - interval*3
-	freq4 = freq - interval*2
+	freq3 = freq - interval*2
+	freq4 = freq + .08
 	
 	if freq1 < .25 then
 		freq1 = .1
 	end
 	if freq2 < .25 then
-		freq2 = .25
+		freq2 = .32
 	end
 	if freq3 < .25 then
-		freq3 = .25
+		freq3 = .3
+	elseif freq3 > .6 then
+		freq3 = .6 + math.random()/100
 	end
 	if freq4 < .2 then
-		freq4 = .2
+		freq4 = .5
+	elseif freq4 > .68 then
+		freq4 = .68 + math.random()/100
 	end
 	
 	freqPush:Push(freq1)
@@ -309,7 +316,7 @@ function rotate(self, x, y, z)
 	rotZ = round(z,2)
 	magnitude = math.sqrt(x^2 + y^2 + z^2)
 	--magnitude = magnitude*1.5 --so that it doesn't go quite as high or low
-	magnitude = -1*math.exp(-5*magnitude) + 1
+	magnitude = -1*math.exp(-4*magnitude) + 1
 	if magnitude > 1 then
 		magnitude = 1
 	elseif magnitude < 0 then
@@ -328,7 +335,7 @@ function accel(self, x, y, z)
 	if energy > .8 then
 		energy = .8
 	end
-	if energy < .2 then
+	if energy < .15 then
 		energy = .2
 	end
 	if energy > .78 then
